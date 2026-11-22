@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roberto Target Calculator</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0b1220;color:#fff;margin:0;padding:24px} .card{max-width:520px;margin:auto;background:#172033;padding:24px;border-radius:18px;box-shadow:0 10px 35px #0006}h1{margin-top:0;color:#70d6ff}label{display:block;margin:14px 0 6px}input{box-sizing:border-box;width:100%;font-size:22px;padding:12px;border-radius:10px;border:1px solid #60708c;background:#0f172a;color:white}.result{margin:20px 0;padding:18px;background:#0f172a;border-radius:12px}.big{font-size:34px;font-weight:bold;color:#7cf29a}button{font-size:18px;padding:12px 16px;border:0;border-radius:10px;margin:5px 5px 5px 0;cursor:pointer}.win{background:#33c66b}.loss{background:#ff6b6b}.reset{background:#d0d5dd}small{color:#b6c2d4}</style></head>
+<body><div class="card"><h1>Roberto's Target Calculator</h1>
+<label>Decimal odds</label><input id="odds" type="number" inputmode="decimal" min="1.01" step="0.01" placeholder="e.g. 9.5">
+<label>Target profit ($)</label><input id="target" type="number" inputmode="decimal" min="0" step="0.01" value="0.10">
+<label>Running loss ($)</label><input id="loss" type="number" inputmode="decimal" min="0" step="0.01" value="0.00">
+<div class="result">Next stake<div class="big" id="stake">$0.00</div><small id="note">Enter decimal odds above.</small></div>
+<button class="loss" id="lost">Lost bet</button><button class="win" id="won">Won bet</button><button class="reset" id="reset">Reset losses</button>
+<p><small>Formula: stake = (running loss + target profit) ÷ (decimal odds − 1). Values are stored on this device.</small></p></div>
+<script>
+const $=id=>document.getElementById(id); let o=$('odds'),t=$('target'),l=$('loss'),s=$('stake'),n=$('note');
+function money(x){return '$'+(+x).toFixed(2)}
+function calc(){let odds=+o.value,target=Math.max(0,+t.value||0),loss=Math.max(0,+l.value||0);localStorage.setItem('rt_target',target);localStorage.setItem('rt_loss',loss);if(!(odds>1)){s.textContent='$0.00';n.textContent='Enter decimal odds above.';return 0;}let stake=(loss+target)/(odds-1);s.textContent=money(stake);n.textContent='Recovers '+money(loss)+' and leaves '+money(target)+' net profit if it wins.';return stake}
+t.value=localStorage.getItem('rt_target')||'0.10';l.value=localStorage.getItem('rt_loss')||'0.00';[o,t,l].forEach(x=>x.addEventListener('input',calc));
+$('lost').onclick=()=>{let stake=calc();if(stake>0){l.value=(Math.max(0,+l.value||0)+stake).toFixed(2);calc();o.select();}};
+$('won').onclick=()=>{l.value='0.00';calc();o.select();};$('reset').onclick=()=>{l.value='0.00';calc();};calc();
+</script></body></html>
